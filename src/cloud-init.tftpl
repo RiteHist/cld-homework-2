@@ -1,0 +1,24 @@
+#cloud-config
+
+users:
+  - name: ${vm_username}
+    ssh-authorized-keys: ${ssh_pub_keys}
+    sudo: ['ALL=(ALL) NOPASSWD:ALL']
+    groups: sudo
+    shell: /bin/bash
+%{ if lamp }
+write_files:
+  - content: |
+      <!DOCTYPE html>
+      <html>
+      <head><title>Coolest image</title></head>
+      <body>
+        <img src="https://${bucket_name}.storage.yandexcloud.net/${image_filename}" alt="Bucket image" width="100">
+      </body>
+      </html>
+    path: /var/www/html/index.html
+    permissions: '0644'
+    owner: 'www-data:www-data'
+runcmd:
+  - systemctl restart apache2
+%{endif}
